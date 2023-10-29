@@ -10,9 +10,9 @@ ui <- dashboardPage(
   dashboardHeader(title = "DashteRoids"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Data Table", tabName = "table"),
-      menuItem("Pie Chart", tabName = "pie"),
-      menuItem("Line Chart", tabName = "line"),
+      menuItem("Data Table", tabName = "table", icon = icon("table")),
+      menuItem("Pie Chart", tabName = "pie", icon = icon("chart-pie")),
+      menuItem("Line Chart", tabName = "line", icon = icon("line-chart")),
       menuItem("Map", tabName = "map", icon = icon("map-pin"))
     )
   ),
@@ -30,7 +30,7 @@ ui <- dashboardPage(
       tabItem(
         tabName = "line",
         fluidRow(
-          uiOutput("slider_year_range"),  # Add the Line Chart slider
+          uiOutput("slider_year_range_linechart"),  # Add the Line Chart slider
           plotlyOutput("line_chart")
         )
       ),
@@ -44,6 +44,7 @@ ui <- dashboardPage(
       tabItem(
         tabName = "map",
         fluidRow(
+          uiOutput("slider_year_range_map"),
           plotlyOutput("map_chart")
         )
       )
