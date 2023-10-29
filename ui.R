@@ -22,8 +22,7 @@ ui <- dashboardPage(
       tabItem(
         tabName = "pie",
         fluidRow(
-          sliderInput("num_classes", "Select the number of classes to display:",
-                      min = 1, max = 466, value = 10, step = 1, ticks = TRUE),
+          uiOutput("slider_num_classes"),  # Add the Pie Chart slider
           plotlyOutput("pie_chart")
         )
       ),
@@ -31,10 +30,7 @@ ui <- dashboardPage(
       tabItem(
         tabName = "line",
         fluidRow(
-          # sliderInput("year_range", "Choose the year range:",
-          #             min = min(data$year), max = max(data$year), value = c(min(data$year), max(data$year)), step = 1),
-          sliderInput("year_range", "Choose the year range:",
-                      min = 800, max = 2013, value = c(800, 2013), step = 1),
+          uiOutput("slider_year_range"),  # Add the Line Chart slider
           plotlyOutput("line_chart")
         )
       ),

@@ -3,7 +3,6 @@ library(DT)
 library(plotly)
 source("data.R")
 
-
 data <- read_and_preprocess_data()
 
 mapboxToken <- "pk.eyJ1IjoibmhtdTEzIiwiYSI6ImNsbXM2aGEwYzA4NGwybXFjZDJtOHlyaWEifQ.rdnzYlRTnPtugsB94ffiNQ"
@@ -11,8 +10,6 @@ mapboxToken <- "pk.eyJ1IjoibmhtdTEzIiwiYSI6ImNsbXM2aGEwYzA4NGwybXFjZDJtOHlyaWEif
 draw_scatter_mapbox <- function(gdf, color = "ylorrd_r", layer = "basic") {
   # Supprimer les lignes avec des valeurs de masse manquantes
   gdf <- gdf[!is.na(gdf$mass), ]
-  
-  
   
   # Créer le graphique scatter mapbox
   map <- plot_ly(data = gdf,
@@ -33,6 +30,19 @@ draw_scatter_mapbox <- function(gdf, color = "ylorrd_r", layer = "basic") {
 
 # Function to create the Shiny server
 server <- function(input, output) {
+  
+  # Slider for the number of classes (Pie Chart)
+  output$slider_num_classes <- renderUI({
+    sliderInput("num_classes", "Select the number of classes to display:",
+                min = 1, max = 466, value = 10, step = 1, ticks = TRUE)
+  })
+  
+  # Slider for the year range (Line Chart)
+  output$slider_year_range <- renderUI({
+    sliderInput("year_range", "Choose the year range:",
+                min = min(data$year), max = max(data$year),
+                value = c(min(data$year), max(data$year)), step = 1)
+  })
   
   output$data_table <- renderDataTable({
     data_subset <- data[, 1:9]
@@ -58,7 +68,6 @@ server <- function(input, output) {
     pie_chart <- pie_chart %>% layout(title = "Distribution of meteorite classes")
     return(pie_chart)
   })
-  
   
   # Fonction pour créer le graphique Mapbox
   output$map_chart <- renderPlotly({
