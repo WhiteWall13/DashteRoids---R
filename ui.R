@@ -13,6 +13,7 @@ ui <- dashboardPage(
       menuItem("Data Table", tabName = "table", icon = icon("table")),
       menuItem("Pie Chart", tabName = "pie", icon = icon("chart-pie")),
       menuItem("Line Chart", tabName = "line", icon = icon("line-chart")),
+      menuItem("Histogram", tabName = "histogram", icon = icon("bar-chart")),
       menuItem("Map", tabName = "map", icon = icon("map-pin"))
     )
   ),
@@ -41,10 +42,20 @@ ui <- dashboardPage(
           dataTableOutput("data_table")
         )
       ),
+      # Onglet Histogram
+      tabItem(
+        tabName = "histogram",
+        fluidRow(
+          plotlyOutput("histogram_chart")
+        )
+      ),
+      # Onglet Map
       tabItem(
         tabName = "map",
         fluidRow(
           uiOutput("slider_year_range_map"),
+          uiOutput("dropdown_layer_map"),
+          uiOutput("dropdown_color_map"),
           plotlyOutput("map_chart")
         )
       )

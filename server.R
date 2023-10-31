@@ -2,12 +2,37 @@ library(shiny)
 library(DT)
 library(plotly)
 source("data.R")
+library(countrycode)
+library(httr)
+library(sp)
+library(rworldmap)
+library(dplyr)
 
+
+# Fonction pour obtenir le continent à partir des coordonnées géographiques
+# Function to get the continent from coordinates
+coords2continent <- function(points) {
+  countriesSP <- getMap(resolution = 'low')
+  
+  # Converting points to a SpatialPoints object
+  # Setting CRS directly to that from rworldmap
+  pointsSP <- SpatialPoints(points, proj4string = CRS(proj4string(countriesSP)))
+  
+  # Use 'over' to get indices of the Polygons object containing each point
+  indices <- over(pointsSP, countriesSP)
+  
+  return(indices$REGION)
+}
+
+
+# Charger les données
 data <- read_and_preprocess_data()
+
 
 mapboxToken <- "pk.eyJ1IjoibmhtdTEzIiwiYSI6ImNsbXM2aGEwYzA4NGwybXFjZDJtOHlyaWEifQ.rdnzYlRTnPtugsB94ffiNQ"
 
 draw_scatter_mapbox <- function(gdf, color = "ylorrd_r", layer = "basic", year_range) {
+  cat(color)
   # Supprimer les lignes avec des valeurs de masse manquantes
   gdf <- gdf[!is.na(gdf$mass), ]
   
@@ -52,6 +77,20 @@ server <- function(input, output) {
                 min = min(data$year_numeric, na.rm = TRUE), max = max(data$year_numeric, na.rm = TRUE),
                 value = c(min(data$year_numeric, na.rm = TRUE), max(data$year_numeric, na.rm = TRUE)), step = 1)
   })
+  
+  output$dropdown_layer_map <- renderUI({
+    selectInput("layer_map", "Choose a map layer :",
+                choices = c("basic", "streets", "outdoors", "light", "dark", "satellite",
+                            "satellite-streets", "open-street-map", "carto-positron", "carto-darkmatter",
+                            "stamen-terrain", "stamen-toner", "stamen-watercolor"),
+                selected = "basic")
+  })
+  
+  output$dropdown_color_map <- renderUI({
+    selectInput("color_map", "Choose a map color :",
+                choices = c('aggrnyl', 'agsunset', 'blackbody', 'bluered', 'blues', 'blugrn', 'bluyl', 'brwnyl', 'bugn', 'bupu', 'burg', 'burgyl', 'cividis', 'darkmint', 'electric', 'emrld', 'gnbu', 'greens', 'greys', 'hot', 'inferno', 'jet', 'magenta', 'magma', 'mint', 'orrd', 'oranges', 'oryel', 'peach', 'pinkyl', 'plasma', 'plotly3', 'pubu', 'pubugn', 'purd', 'purp', 'purples', 'purpor', 'rainbow', 'rdbu', 'rdpu', 'redor', 'reds', 'sunset', 'sunsetdark', 'teal', 'tealgrn', 'turbo', 'viridis', 'ylgn', 'ylgnbu', 'ylorbr', 'ylorrd', 'algae', 'amp', 'deep', 'dense', 'gray', 'haline', 'ice', 'matter', 'solar', 'speed', 'tempo', 'thermal', 'turbid', 'armyrose', 'brbg', 'earth', 'fall', 'geyser', 'prgn', 'piyg', 'picnic', 'portland', 'puor', 'rdgy', 'rdylbu', 'rdylgn', 'spectral', 'tealrose', 'temps', 'tropic', 'balance', 'curl', 'delta', 'oxy', 'edge', 'hsv', 'icefire', 'phase', 'twilight', 'mrybm', 'mygbm'),
+                selected = "ylorrd")
+  })
 
   output$data_table <- renderDataTable({
     data_subset <- data[, 1:9]
@@ -77,13 +116,33 @@ server <- function(input, output) {
     pie_chart <- pie_chart %>% layout(title = "Distribution of meteorite classes")
     return(pie_chart)
   })
-
+  
+  output$histogram_chart <- renderPlotly({
+    # Filtrer les lignes avec des coordonnées non manquantes
+    data_hist <- data[!is.na(data$reclat) & !is.na(data$reclong), ]
+    
+    # Fonction pour obtenir le continent à partir des coordonnées géographiques
+    coordinates <- data.frame(lon = data_hist$reclong, lat = data_hist$reclat)
+    data_hist$continent <- coords2continent(coordinates)
+    
+    # Groupez par "continent" et créez l'histogramme
+    grouped_data <- data_hist %>% group_by(continent) %>% summarise(Count = n())
+    chart_title <- "Number of meteorites per continent"
+    
+    # Créez l'histogramme
+    histogram_chart <- plot_ly(grouped_data, x = ~continent, y = ~Count, type = 'bar')
+    histogram_chart <- histogram_chart %>% layout(title = chart_title)
+    
+    return(histogram_chart)
+  })
+  
   # Fonction pour créer le graphique Mapbox
   output$map_chart <- renderPlotly({
     gdf <- data
 
+    color <- input$color_map
     # Appeler la fonction pour créer le graphique
-    map <- draw_scatter_mapbox(gdf, color = "ylorrd_r", layer = "basic", year_range = input$year_range_map)
+    map <- draw_scatter_mapbox(gdf, color = color, layer = input$layer_map, year_range = input$year_range_map)
 
     return(map)
   })

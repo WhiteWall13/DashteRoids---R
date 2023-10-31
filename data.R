@@ -16,16 +16,16 @@ read_data_from_csv <- function(file_path) {
 # Function to read and preprocess the data
 read_and_preprocess_data <- function() {
   
-  # data <- read.socrata("https://data.nasa.gov/resource/gh4g-9sfh.json")
-  data <- read_data_from_csv("Meteorite_Landings.csv")
+  data <- read.socrata("https://data.nasa.gov/resource/gh4g-9sfh.json")
+  # data <- read_data_from_csv("Meteorite_Landings.csv")
   
   # data <- tryCatch({
   #   return(read.socrata("https://data.nasa.gov/resource/gh4g-9sfh.json"))
   # }, error = function(e) {
-  #   return(read_data_from_csv("Meteorite_Landings.csv"))  # En cas d'erreur, retourne NA
+  #   return(read_data_from_csv("Meteorite_Landings.csv"))
   # })
   
-  # data$year <- sub("-.*", "", data$year)
+  data$year <- sub("-.*", "", data$year)
   data$mass <- as.numeric(data$mass)
   data$reclat <- as.numeric(data$reclat)
   data$reclong <- as.numeric(data$reclong)
