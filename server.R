@@ -51,6 +51,12 @@ draw_scatter_mapbox <- function(gdf, color = "ylorrd_r", layer = "basic", year_r
   # Configurer le jeton Mapbox
   map <- config(map, mapboxAccessToken = mapboxToken)
 
+  print(class(map))
+  str(map)
+  
+  
+  
+  
   # Retourner le graphique
   return(map)
 }
@@ -140,9 +146,8 @@ server <- function(input, output) {
   output$map_chart <- renderPlotly({
     gdf <- data
 
-    color <- input$color_map
-    # Appeler la fonction pour créer le graphique
-    map <- draw_scatter_mapbox(gdf, color = color, layer = input$layer_map, year_range = input$year_range_map)
+    # color <- input$color_map
+    map <- draw_scatter_mapbox(gdf, layer = input$layer_map, year_range = input$year_range_map)
 
     return(map)
   })

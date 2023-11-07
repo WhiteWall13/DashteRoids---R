@@ -23,7 +23,7 @@ ui <- dashboardPage(
       tabItem(
         tabName = "pie",
         fluidRow(
-          uiOutput("slider_num_classes"),  # Add the Pie Chart slider
+          uiOutput("slider_num_classes"),
           plotlyOutput("pie_chart")
         )
       ),
@@ -55,7 +55,6 @@ ui <- dashboardPage(
         fluidRow(
           uiOutput("slider_year_range_map"),
           uiOutput("dropdown_layer_map"),
-          uiOutput("dropdown_color_map"),
           plotlyOutput("map_chart")
         )
       )
