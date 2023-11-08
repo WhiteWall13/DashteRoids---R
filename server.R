@@ -31,11 +31,13 @@ data <- read_and_preprocess_data()
 
 mapboxToken <- "pk.eyJ1IjoibmhtdTEzIiwiYSI6ImNsbXM2aGEwYzA4NGwybXFjZDJtOHlyaWEifQ.rdnzYlRTnPtugsB94ffiNQ"
 
-draw_scatter_mapbox <- function(gdf, color = "ylorrd_r", layer = "basic", year_range) {
+draw_scatter_mapbox <- function(gdf, color = "ylorrd_r", layer = "open-street-map", year_range) {
   cat(color)
   # Supprimer les lignes avec des valeurs de masse manquantes
   gdf <- gdf[!is.na(gdf$mass), ]
-  
+  gdf <- gdf[!is.na(gdf$reclat), ]
+  gdf <- gdf[!is.na(gdf$reclong), ]
+
   gdf <- gdf[gdf$year_numeric >= year_range[1] & gdf$year_numeric <= year_range[2], ]
 
   # Créer le graphique scatter mapbox
@@ -49,17 +51,32 @@ draw_scatter_mapbox <- function(gdf, color = "ylorrd_r", layer = "basic", year_r
     layout(mapbox = list(style = layer, center = list(lon = 0, lat = 40), zoom = 0.5))
 
   # Configurer le jeton Mapbox
-  map <- config(map, mapboxAccessToken = mapboxToken)
+  # map <- config(map, mapboxAccessToken = mapboxToken)
 
-  print(class(map))
-  str(map)
-  
-  
-  
-  
   # Retourner le graphique
   return(map)
 }
+
+# draw_scatter_mapbox <- function(gdf) {
+#   # Assurez-vous que gdf contient les colonnes 'reclat' et 'reclong'
+#   if(!all(c('reclat', 'reclong') %in% names(gdf))) {
+#     stop("Les données doivent contenir les colonnes 'reclat' et 'reclong'")
+#   }
+#   
+#   # Créer un graphique scatter mapbox simple
+#   map <- plot_ly(data = gdf,
+#                  lat = ~reclat,
+#                  lon = ~reclong,
+#                  type = 'scattermapbox',
+#                  # marker = list(size = ~gdf$power_mass, sizemode = 'diameter', color = ~gdf$year, colorscale = color),
+#                  mode = 'markers') %>%
+#     layout(mapbox = list(style = 'open-street-map', center = list(lon = 0, lat = 0), zoom = 1))
+#   
+#   map <- config(map, mapboxAccessToken = mapboxToken)
+#   
+#   return(map)
+# }
+
 
 # Function to create the Shiny server
 server <- function(input, output) {
@@ -86,10 +103,9 @@ server <- function(input, output) {
   
   output$dropdown_layer_map <- renderUI({
     selectInput("layer_map", "Choose a map layer :",
-                choices = c("basic", "streets", "outdoors", "light", "dark", "satellite",
-                            "satellite-streets", "open-street-map", "carto-positron", "carto-darkmatter",
+                choices = c("open-street-map", "carto-positron", "carto-darkmatter",
                             "stamen-terrain", "stamen-toner", "stamen-watercolor"),
-                selected = "basic")
+                selected = "open-street-map")
   })
   
   output$dropdown_color_map <- renderUI({
@@ -146,8 +162,9 @@ server <- function(input, output) {
   output$map_chart <- renderPlotly({
     gdf <- data
 
-    # color <- input$color_map
-    map <- draw_scatter_mapbox(gdf, layer = input$layer_map, year_range = input$year_range_map)
+    color <- input$color_map
+    map <- draw_scatter_mapbox(gdf, color = color, layer = input$layer_map, year_range = input$year_range_map)
+    # map <- draw_scatter_mapbox(data)
 
     return(map)
   })
