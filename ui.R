@@ -5,15 +5,14 @@ library(shinyjs)
 source("server.R")
 
 
-# Function to create the Shiny UI
 ui <- dashboardPage(
   dashboardHeader(title = "DashteRoids"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Data Table", tabName = "table", icon = icon("table")),
+      menuItem("Histogram and Line Chart", tabName = "line", icon = icon("line-chart")),
       menuItem("Pie Chart", tabName = "pie", icon = icon("chart-pie")),
-      menuItem("Line Chart", tabName = "line", icon = icon("line-chart")),
-      menuItem("Histogram", tabName = "histogram", icon = icon("bar-chart")),
+      menuItem("Bar chart", tabName = "bar_chart", icon = icon("bar-chart")),
       menuItem("Map", tabName = "map", icon = icon("map-pin"))
     )
   ),
@@ -27,12 +26,14 @@ ui <- dashboardPage(
           plotlyOutput("pie_chart")
         )
       ),
-      # Onglet Line Chart
+      # Onglet Line Chart and Histogram
       tabItem(
         tabName = "line",
         fluidRow(
-          uiOutput("slider_year_range_linechart"),  # Add the Line Chart slider
-          plotlyOutput("line_chart")
+          selectInput("chart_type", "Select Chart Type", choices = c("Histogram", "Line Chart"), selected = "Histogram"),
+          uiOutput("slider_year_range"),
+          plotlyOutput("line_chart"),
+          plotlyOutput("histogram_chart")
         )
       ),
       # Onglet Data Table
@@ -42,11 +43,11 @@ ui <- dashboardPage(
           dataTableOutput("data_table")
         )
       ),
-      # Onglet Histogram
+      # Onglet Bar Chart
       tabItem(
-        tabName = "histogram",
+        tabName = "bar_chart",
         fluidRow(
-          plotlyOutput("histogram_chart")
+          plotlyOutput("bar_chart")
         )
       ),
       # Onglet Map
@@ -62,3 +63,5 @@ ui <- dashboardPage(
     )
   )
 )
+
+
