@@ -1,13 +1,16 @@
+source("functions.R")
+install_if_missing("RSocrata")
+
 library(RSocrata)
 
 read_data_from_csv <- function(file_path) {
-  # Vérifier si le fichier existe
+  # Check if file eixists
   if (!file.exists(file_path)) {
-    cat("Le fichier spécifié n'existe pas.\n")
+    cat("The data file doesn't exists.")
     return(NULL)
   }
   
-  # Lire les données à partir du fichier CSV
+  # Read data from CSV
   data <- read.csv(file_path)
   
   return(data)
@@ -16,16 +19,17 @@ read_data_from_csv <- function(file_path) {
 # Function to read and preprocess the data
 read_and_preprocess_data <- function() {
   
-  data <- read.socrata("https://data.nasa.gov/resource/gh4g-9sfh.json")
+  # data <- read.socrata("https://data.nasa.gov/resource/gh4g-9sfh.json")
   # data <- read_data_from_csv("Meteorite_Landings.csv")
   
-  # data <- tryCatch({
-  #   return(read.socrata("https://data.nasa.gov/resource/gh4g-9sfh.json"))
-  # }, error = function(e) {
-  #   return(read_data_from_csv("Meteorite_Landings.csv"))
-  # })
+  data <- tryCatch({
+    data = read.socrata("https://data.nasa.gov/resource/gh4g-9sfh.json")
+    data$year <- sub("-.*", "", data$year)
+    return(data)
+  }, error = function(e) {
+    return(read_data_from_csv("Meteorite_Landings.csv"))
+  })
   
-  data$year <- sub("-.*", "", data$year)
   data$mass <- as.numeric(data$mass)
   data$reclat <- as.numeric(data$reclat)
   data$reclong <- as.numeric(data$reclong)
