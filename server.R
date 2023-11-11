@@ -8,7 +8,7 @@ install_if_missing("sp")
 install_if_missing("rworldmap")
 install_if_missing("dplyr")
 
-source("data.R")
+source("data/data.R")
 library(shiny)
 library(DT)
 library(plotly)
@@ -134,6 +134,7 @@ server <- function(input, output) {
     return(map)
   })
   
+  # Texts
   output$piechart_text_output <- renderText({
     piechart_text
   })
