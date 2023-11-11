@@ -144,20 +144,6 @@ Code Structure Diagram
 
 ```mermaid
 graph TD;
-    app.R-->|sources|functions.R;
-    app.R-->|sources|server.R;
-    app.R-->|sources|ui.R;
-    data-->data.R;
-    data-->file
-    file-->Meteorite_Landings.csv;
-    server.R-->|uses|data.R;
-    ui.R-->|uses|data.R;
-    server.R-->|uses|functions.R;
-    ui.R-->|uses|functions.R;
-```
-
-```mermaid
-graph TD;
     Dashteroids-->app.R;
     Dashteroids-->ui.R;
     Dashteroids-->server.R;
