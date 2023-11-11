@@ -41,7 +41,7 @@ cd DashteRoids---R
 ```
 3. Run the App: Execute the following commands.
 ```bash
-cd DashteRoids---R
+R -e "shiny::runApp('app', port = 8080)"
 ```
 4. **Access the Dashboard**: Open your preferred web browser and visit http://localhost:8080 (or the port you specified) to start exploring the data.
 
@@ -155,6 +155,20 @@ graph TD;
     server.R-->|uses|functions.R;
     ui.R-->|uses|functions.R;
 ```
+
+```mermaid
+graph TD;
+    Dashteroids-->app.R;
+    Dashteroids-->ui.R;
+    Dashteroids-->server.R;
+    Dashteroids-->functions.R;
+    Dashteroids-->main.py;
+    Dashteroids-->data;
+    data-->data.R;
+    data-->file
+    file-->Meteorite_Landings.csv;
+```
+
 ### Detailed Overview
 #### `app.R`
 This is the entry point of the Shiny application. It sources the functions.R, server.R, and ui.R scripts and initializes the Shiny app with shinyApp(ui = ui, server = server).
